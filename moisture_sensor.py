@@ -1,83 +1,76 @@
-import json
-import datetime
-import dateutil.relativedelta as relativedelta
+import time
 from email_notifs import all_email_func
+from main_menu import Menu
 # import RPi.GPIO as GPIO
+
 
 
 # The grow hat will send pulses as a Hz value between 0 and 30, the lower the number the wetter, the highter the dryer
 # I want to track in real time when the plant was watered and store that date into the json to access later
-# Work out how to nest a new dictionary into the list of values i.e {email:{bonsai:14/03/2025}}
-# In the above example, email is the key of the first dictionary and the new dictionary is the value of the first dictionary
-# Inside this dictionary the name of the plant i.e 'bonsai' is the key and the value is the date when the plant was watered 
+
+# What happens when the plant's moisture is read by the pi:
+    # The sensors will detect the moisture of the plant's soil if it is above 20hz (hits the dry threshold) it will trigger an email to be sent to the user
+    # The user will water the plant and update the 3rd option in the menu giving a date when it was watered
+        # If the user does not water the plant and the function tracked_moisture continues to ping that the plant is still dry it will send the user another email
+        # (Could make another function that has stronger wording)
+
+# To do off the above notes:
+    # Make a tracked moisture function that will track the moisture of plants using the pi sensors - it will track between wet threshold 10 and dry 20
+    # Another email function that will send another email if the user decides not to water the plant of the day of the first reminder
+    # Consider tying tracked_moisture function in with the date the reminder email is sent 
+        # for example the moisture tracking pings that the plant is dry so an email is sent out and the user waters the plant - if the user actually watered the plant
+        # the tracked moisture would become more wet which then would update the last_watered function and the value of that stored in the dict
 
 
-class Moisture:
 
-    def __init__(self):
-        self.moisture_level = 0
-        self.dry_threshold = 20
-        self.wet_threshold = 10
-        self.wet_point = 3
-        self.dry_point = 25
-        self.called = False
-        times = []
+class MoistureTracker:
 
-    def read_moisture(self):
-        self.moisture_level = 0
-        return self.moisture_level
+    def __init__(self, current_user, saved_data={}):
+        self.saved_data = saved_data 
+        self.dry_value = 0.85
+        self.wet_value = 0.15
+        self.dry_threshold = 50
+        self.current_user = current_user
+        self.current_plant = None
+        self.sensor_count = 3
+        # self.gh = grow_hat 
+
+    def read_sensor(self, sensor_index):
+        if sensor_index not in range(self.sensor_count):
+            raise ValueError("Use sensor index of 0, 1, or 2")
+        return self.gh.moisture[sensor_index]
+
+    def read_moisture(self, sensor_index):
+        raw = self.read_sensor(sensor_index)
+        percent = 100 * (1 - raw - self.wet_value) / (self.dry_value - self.wet_value)
+        return max(0, min(100, percent))
     
-    def convert_to_percent(self):
-        float_value = self.read_moisture
-        print("{:.2%}".format(float_value))
+    def check_plants(self):
+        for i in range(self.sensor_count):
+            self.current_plant(i)
+            moisture = self.read_moisture(i)
+            need_water = moisture < self.dry_threshold
+            if need_water:
+                self.check_and_send_alert(self.current_plant)
 
-    # def dry_point(self):
-    #     self.moisture_level <= self.dry_point
+    def check_and_send_alert(self, saved_data):
+        last_alert = saved_data.get(self.current_user,{}).get(self.current_plant)
+        if time.time() - last_alert < 3600:
+            return
+        self.send_email_alert()
 
-    # def wet_point(self):
-    #     self.moisture_level >= self.wet_point
-
-    def run_program(self):
-        while True:
-            moisture_reading = self.read_moisture
-            if moisture_reading >= self.moisture_threshold:
-                all_email_func() # Send email - need to work out how to incorporate the info stored in the dictionary
-            else:
-                print("The plant does not need watering")
-            break
+    def send_email_alert(self):
+        all_email_func()
 
 
+test = MoistureTracker(current_user)
+test.email_details(current_user)
 
-    def plant_watered(self):
-        if self.moisture_level <= 17:
-
-
+    
         
 
 
 
-    def plant_watered_data(self):
-        with open("stored_data.json", "w") as file:
-            json.dump(self.times, file, indent = 4)
-
-
-    def last_watered_date(self):
-        if all_email_func() 
-
-        if self.read_moisture >= self.moisture_threshold:
-            no_moisture = self.read_moisture >= self.moisture_threshold
-            if no_moisture < :
-                current_date = datetime.today().strftime('%Y-%m-%d')
-                delta = current_date - no_moisture
-                print(f"The plant was watered {delta} of days ago") # Need to work out how to get the date when the plant got too dry
-        else:
-            print(f"There is currently {self.convert_to_percent}% moisture in your plant, so it doesn't need watering yet")                                            
-
     
-def plant_moisture():
-    soil_moisture = Moisture
-    soil_moisture.read_moisture 
-    soil_moisture.run_program
-
-plant_moisture()
+                                    
     

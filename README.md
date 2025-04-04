@@ -1,1 +1,0 @@
-# Plant-watering-reminder-app

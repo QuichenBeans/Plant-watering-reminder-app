@@ -11,18 +11,7 @@ app_password = "gytn kjvy trhg tpnp"
 
 
 class Emailnotif:
-    # def menu(self):
-    #     print("1. Send email")
-    #     print("2. Exit")
-    #     while True:
-    #         choice = input("Enter your choice: ")
-    #         if choice == "1":
-    #             self.email_contents()
-    #             self.create_email()
-    #             self.connect_to_server()
-    #         elif choice == "2":
-    #             print("Exit")
-    #             break
+    email = None
 
     @staticmethod
     def email_contents():
@@ -35,7 +24,7 @@ class Emailnotif:
         subject, body = Emailnotif.email_contents()
         msg = MIMEMultipart()
         msg['From'] = app_email_address
-        msg['To'] = email
+        msg['To'] = email # work out how to get the stored dictionary key into this
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
         text = msg.as_string()

@@ -8,7 +8,7 @@ from main_menu import Menu
 if __name__ == "__main__":
     saved_data = {}
     menu = Menu(saved_data)
-    menu.main_menu()
+    menu.app_start()
    
     
 
@@ -23,14 +23,6 @@ if __name__ == "__main__":
 # over something less than 5 out of the 30hz)
 
 
-# def last_watered():
-    
-
-# def track_moisture():
-
-
-
-
 
 
 # Once moisture reaches a low level (whatever level we decided on) it will ping the user with a message reminding them to water the plant
@@ -39,12 +31,5 @@ if __name__ == "__main__":
 # If the user waters the plant, the date will be updated to the current date - use if statement and 
 # evaluate as True or False depending on if the plant was watered on that date
 # If the user does not water the plant, the date will remain the same and the user will continue to receive reminders - think while loop
-def is_moisture():
-    moisture_detection = 100
-    while moisture_detection >= 80:
-        print("The plant has moisture")
-        break
-    else:
-        print("The plant needs watering")
 
 
